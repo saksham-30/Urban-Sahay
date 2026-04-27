@@ -1,0 +1,1 @@
+ALTER TABLE public.service_providers ADD COLUMN service_radius integer NOT NULL DEFAULT 10;
