@@ -41,7 +41,7 @@ const EarningsChart = () => {
           <BarChart data={earningsData}>
             <CartesianGrid strokeDasharray="3 3" vertical={false} />
             <XAxis dataKey="day" tickLine={false} axisLine={false} fontSize={12} />
-            <YAxis tickLine={false} axisLine={false} fontSize={12} />
+            <YAxis domain={[0, 8000]} ticks={[0, 2000, 4000, 6000, 8000]} tickLine={false} axisLine={false} fontSize={12} />
             <ChartTooltip content={<ChartTooltipContent />} />
             <Bar dataKey="earnings" fill="hsl(var(--primary))" radius={[6, 6, 0, 0]} />
           </BarChart>

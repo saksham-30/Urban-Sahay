@@ -62,7 +62,25 @@ This project is built with:
 
 ## How can I deploy this project?
 
-Simply open [Lovable](https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID) and click on Share -> Publish.
+The easiest GitHub-based setup is:
+
+1. Push this repository to GitHub.
+2. Deploy the frontend from the repo root on Vercel.
+3. Deploy the backend on a Node hosting provider such as Render, Railway, or Fly.io.
+4. Set the frontend environment variables in Vercel:
+	- `VITE_API_URL` = your backend URL ending in `/api`
+	- `VITE_ML_API_URL` = your ML API URL
+	- `VITE_PRICE_API_URL` = your price API URL
+	- `VITE_SUPABASE_URL` and `VITE_SUPABASE_PUBLISHABLE_KEY` if you use the Supabase chatbot flow
+5. Set the backend environment variables on the backend host:
+	- `MONGO_URI`
+	- `JWT_SECRET`
+	- `JWT_EXPIRES_IN`
+	- `FRONTEND_URL` = your Vercel app URL
+
+For local development, copy `.env.example` to `.env` and `backend/.env.example` to `backend/.env`.
+
+Vercel config is already included in [vercel.json](vercel.json) for SPA routing.
 
 ## Can I connect a custom domain to my Lovable project?
 

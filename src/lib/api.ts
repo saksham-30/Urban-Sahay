@@ -1,4 +1,7 @@
+import type { Language } from '@/lib/translations';
+
 const BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+export const API_ORIGIN = BASE_URL.replace(/\/api$/, '');
 
 function getToken(): string | null {
   return localStorage.getItem('urban_sahay_token');
@@ -30,12 +33,12 @@ export const api = {
 
   // User profile
   getProfile: () => request<UserProfile>('/users/profile'),
-  updateProfile: (body: { fullName: string; phone: string }) =>
+  updateProfile: (body: Partial<{ fullName: string; phone: string | null; language: Language }>) =>
     request<UserProfile>('/users/profile', { method: 'PUT', body: JSON.stringify(body) }),
 
   // Provider profile
   getProviderProfile: () => request<ProviderProfile>('/providers/profile'),
-  updateProviderProfile: (body: Partial<ProviderProfile>) =>
+  updateProviderProfile: (body: Partial<ProviderProfile> & { language?: Language }) =>
     request<ProviderProfile>('/providers/profile', { method: 'PUT', body: JSON.stringify(body) }),
   searchProviders: (params: { serviceType?: string; city?: string }) => {
     const qs = new URLSearchParams(params as Record<string, string>).toString();
@@ -73,6 +76,7 @@ export interface AuthUser {
   id: string;
   email: string;
   role: 'user' | 'service_provider';
+  language?: Language;
 }
 
 export interface UserProfile {
@@ -81,6 +85,7 @@ export interface UserProfile {
   fullName: string;
   email: string | null;
   phone: string | null;
+  language: Language;
   createdAt: string;
   updatedAt: string;
 }
@@ -95,6 +100,7 @@ export interface ProviderProfile {
   description: string | null;
   experienceYears: number | null;
   hourlyRate: string | null;
+  language: Language;
   rating: number;
   totalReviews: number;
   isAvailable: boolean;

@@ -7,10 +7,12 @@ import { useNavigate } from 'react-router-dom';
 import { useEffect } from 'react';
 import { ArrowLeft } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { useLanguage } from '@/hooks/useLanguage';
 
 const KYCVerification = () => {
   const { user, isLoading } = useAuth();
   const navigate = useNavigate();
+  const { t } = useLanguage();
 
   useEffect(() => {
     if (!isLoading && !user) navigate('/auth');
@@ -30,10 +32,10 @@ const KYCVerification = () => {
       <main className="container mx-auto px-4 pt-24 pb-16 max-w-lg">
         <BackToDashboard />
         <Button variant="ghost" onClick={() => navigate(-1)} className="mb-4">
-          <ArrowLeft className="w-4 h-4 mr-2" /> Back
+          <ArrowLeft className="w-4 h-4 mr-2" /> {t('common.back')}
         </Button>
-        <h1 className="text-2xl font-bold text-foreground mb-2">e-KYC Verification</h1>
-        <p className="text-muted-foreground mb-8">Complete your identity verification to access all services on Urban Sahay.</p>
+        <h1 className="text-2xl font-bold text-foreground mb-2">{t('kyc.title')}</h1>
+        <p className="text-muted-foreground mb-8">{t('kyc.subtitle')}</p>
         <KYCVerificationFlow />
       </main>
       <Footer />

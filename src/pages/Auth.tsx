@@ -14,6 +14,7 @@ import {
 } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
 import { useAuth } from '@/hooks/useAuth';
+import { useLanguage } from '@/hooks/useLanguage';
 import { toast } from 'sonner';
 import { Mail, Lock, User, Phone, Briefcase, Building2, ArrowLeft } from 'lucide-react';
 import { z } from 'zod';
@@ -54,6 +55,7 @@ type SignupType = 'user' | 'service_provider';
 const Auth = () => {
   const navigate = useNavigate();
   const { user, signUp, signIn, isLoading } = useAuth();
+  const { t } = useLanguage();
   const [activeTab, setActiveTab] = useState<'signin' | 'signup'>('signin');
   const [signupType, setSignupType] = useState<SignupType | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -124,7 +126,7 @@ const Auth = () => {
     if (error) {
       toast.error(error.message);
     } else {
-      toast.success('Signed in successfully!');
+      toast.success(t('auth.signInSuccess'));
       navigate('/');
     }
 
@@ -172,7 +174,7 @@ const Auth = () => {
     if (error) {
       toast.error(error.message);
     } else {
-      toast.success('Account created! Please check your email to verify your account.');
+      toast.success(t('auth.accountCreated'));
       resetForm();
       setActiveTab('signin');
     }
@@ -238,8 +240,8 @@ const Auth = () => {
 
           <Tabs value={activeTab} onValueChange={(v) => { setActiveTab(v as 'signin' | 'signup'); setSignupType(null); resetForm(); }}>
             <TabsList className="grid w-full grid-cols-2 mb-8">
-              <TabsTrigger value="signin">Sign In</TabsTrigger>
-              <TabsTrigger value="signup">Sign Up</TabsTrigger>
+              <TabsTrigger value="signin">{t('auth.signIn')}</TabsTrigger>
+              <TabsTrigger value="signup">{t('auth.signUp')}</TabsTrigger>
             </TabsList>
 
             {/* Sign In Form */}
@@ -249,18 +251,18 @@ const Auth = () => {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.3 }}
               >
-                <h2 className="text-2xl font-bold text-foreground mb-2">Welcome back</h2>
-                <p className="text-muted-foreground mb-6">Sign in to your account to continue</p>
+                <h2 className="text-2xl font-bold text-foreground mb-2">{t('auth.welcomeBack')}</h2>
+                <p className="text-muted-foreground mb-6">{t('auth.signInSubtitle')}</p>
 
                 <form onSubmit={handleSignIn} className="space-y-4">
                   <div>
-                    <Label htmlFor="signin-email">Email</Label>
+                    <Label htmlFor="signin-email">{t('auth.email')}</Label>
                     <div className="relative mt-1">
                       <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                       <Input
                         id="signin-email"
                         type="email"
-                        placeholder="you@example.com"
+                        placeholder={t('auth.placeholderEmail')}
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
                         className="pl-10"
@@ -271,7 +273,7 @@ const Auth = () => {
                   </div>
 
                   <div>
-                    <Label htmlFor="signin-password">Password</Label>
+                    <Label htmlFor="signin-password">{t('auth.password')}</Label>
                     <div className="relative mt-1">
                       <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                       <Input
@@ -288,7 +290,7 @@ const Auth = () => {
                   </div>
 
                   <Button type="submit" className="w-full" size="lg" disabled={isSubmitting}>
-                    {isSubmitting ? 'Signing in...' : 'Sign In'}
+                    {isSubmitting ? t('auth.signingIn') : t('auth.signIn')}
                   </Button>
                 </form>
               </motion.div>
@@ -305,8 +307,8 @@ const Auth = () => {
                     exit={{ opacity: 0, y: -10 }}
                     transition={{ duration: 0.3 }}
                   >
-                    <h2 className="text-2xl font-bold text-foreground mb-2">Create an account</h2>
-                    <p className="text-muted-foreground mb-6">How would you like to join Urban Sahay?</p>
+                    <h2 className="text-2xl font-bold text-foreground mb-2">{t('auth.createAccount')}</h2>
+                    <p className="text-muted-foreground mb-6">{t('auth.joinSubtitle')}</p>
 
                     <div className="space-y-4">
                       <button
@@ -318,10 +320,8 @@ const Auth = () => {
                             <User className="w-6 h-6 text-primary" />
                           </div>
                           <div>
-                            <h3 className="font-semibold text-foreground mb-1">I need services</h3>
-                            <p className="text-sm text-muted-foreground">
-                              Find and connect with verified professionals in your area
-                            </p>
+                            <h3 className="font-semibold text-foreground mb-1">{t('auth.needServices')}</h3>
+                            <p className="text-sm text-muted-foreground">{t('auth.needServicesDesc')}</p>
                           </div>
                         </div>
                       </button>
@@ -335,10 +335,8 @@ const Auth = () => {
                             <Briefcase className="w-6 h-6 text-accent" />
                           </div>
                           <div>
-                            <h3 className="font-semibold text-foreground mb-1">I provide services</h3>
-                            <p className="text-sm text-muted-foreground">
-                              Join as a professional and grow your business
-                            </p>
+                            <h3 className="font-semibold text-foreground mb-1">{t('auth.provideServices')}</h3>
+                            <p className="text-sm text-muted-foreground">{t('auth.provideServicesDesc')}</p>
                           </div>
                         </div>
                       </button>
@@ -357,21 +355,21 @@ const Auth = () => {
                       className="flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground mb-4 transition-colors"
                     >
                       <ArrowLeft className="w-4 h-4" />
-                      Back
+                      {t('auth.back')}
                     </button>
 
-                    <h2 className="text-2xl font-bold text-foreground mb-2">Create your account</h2>
-                    <p className="text-muted-foreground mb-6">Fill in your details to get started</p>
+                    <h2 className="text-2xl font-bold text-foreground mb-2">{t('auth.createAccount')}</h2>
+                    <p className="text-muted-foreground mb-6">{t('auth.fillDetails')}</p>
 
                     <form onSubmit={handleSignUp} className="space-y-4">
                       <div>
-                        <Label htmlFor="user-name">Full Name</Label>
+                        <Label htmlFor="user-name">{t('auth.fullName')}</Label>
                         <div className="relative mt-1">
                           <User className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                           <Input
                             id="user-name"
                             type="text"
-                            placeholder="John Doe"
+                            placeholder={t('auth.placeholderName')}
                             value={fullName}
                             onChange={(e) => setFullName(e.target.value)}
                             className="pl-10"
@@ -382,13 +380,13 @@ const Auth = () => {
                       </div>
 
                       <div>
-                        <Label htmlFor="user-email">Email</Label>
+                        <Label htmlFor="user-email">{t('auth.email')}</Label>
                         <div className="relative mt-1">
                           <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                           <Input
                             id="user-email"
                             type="email"
-                            placeholder="you@example.com"
+                            placeholder={t('auth.placeholderEmail')}
                             value={email}
                             onChange={(e) => setEmail(e.target.value)}
                             className="pl-10"
@@ -399,13 +397,13 @@ const Auth = () => {
                       </div>
 
                       <div>
-                        <Label htmlFor="user-phone">Phone (optional)</Label>
+                        <Label htmlFor="user-phone">{t('auth.phoneOptional')}</Label>
                         <div className="relative mt-1">
                           <Phone className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                           <Input
                             id="user-phone"
                             type="tel"
-                            placeholder="9876543210"
+                            placeholder={t('auth.placeholderPhone')}
                             value={phone}
                             onChange={(e) => setPhone(e.target.value)}
                             className="pl-10"
@@ -415,7 +413,7 @@ const Auth = () => {
                       </div>
 
                       <div>
-                        <Label htmlFor="user-password">Password</Label>
+                        <Label htmlFor="user-password">{t('auth.password')}</Label>
                         <div className="relative mt-1">
                           <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                           <Input
@@ -432,7 +430,7 @@ const Auth = () => {
                       </div>
 
                       <Button type="submit" className="w-full" size="lg" disabled={isSubmitting}>
-                        {isSubmitting ? 'Creating account...' : 'Create Account'}
+                        {isSubmitting ? t('auth.creatingAccount') : t('auth.createAccountCta')}
                       </Button>
                     </form>
                   </motion.div>
@@ -449,22 +447,22 @@ const Auth = () => {
                       className="flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground mb-4 transition-colors"
                     >
                       <ArrowLeft className="w-4 h-4" />
-                      Back
+                      {t('auth.back')}
                     </button>
 
-                    <h2 className="text-2xl font-bold text-foreground mb-2">Join as a Professional</h2>
-                    <p className="text-muted-foreground mb-6">Tell us about your services</p>
+                    <h2 className="text-2xl font-bold text-foreground mb-2">{t('auth.joinProfessional')}</h2>
+                    <p className="text-muted-foreground mb-6">{t('auth.tellUs')}</p>
 
                     <form onSubmit={handleSignUp} className="space-y-4">
                       <div className="grid grid-cols-2 gap-4">
                         <div>
-                          <Label htmlFor="sp-name">Full Name</Label>
+                          <Label htmlFor="sp-name">{t('auth.fullName')}</Label>
                           <div className="relative mt-1">
                             <User className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                             <Input
                               id="sp-name"
                               type="text"
-                              placeholder="Your name"
+                              placeholder={t('auth.placeholderNameSelf')}
                               value={fullName}
                               onChange={(e) => setFullName(e.target.value)}
                               className="pl-10"
@@ -475,13 +473,13 @@ const Auth = () => {
                         </div>
 
                         <div>
-                          <Label htmlFor="sp-phone">Phone</Label>
+                          <Label htmlFor="sp-phone">{t('auth.phone')}</Label>
                           <div className="relative mt-1">
                             <Phone className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                             <Input
                               id="sp-phone"
                               type="tel"
-                              placeholder="9876543210"
+                              placeholder={t('auth.placeholderPhone')}
                               value={phone}
                               onChange={(e) => setPhone(e.target.value)}
                               className="pl-10"
@@ -493,13 +491,13 @@ const Auth = () => {
                       </div>
 
                       <div>
-                        <Label htmlFor="sp-email">Email</Label>
+                        <Label htmlFor="sp-email">{t('auth.email')}</Label>
                         <div className="relative mt-1">
                           <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                           <Input
                             id="sp-email"
                             type="email"
-                            placeholder="you@example.com"
+                            placeholder={t('auth.placeholderEmail')}
                             value={email}
                             onChange={(e) => setEmail(e.target.value)}
                             className="pl-10"
@@ -511,10 +509,10 @@ const Auth = () => {
 
                       <div className="grid grid-cols-2 gap-4">
                         <div>
-                          <Label>Service Type</Label>
+                          <Label>{t('auth.serviceType')}</Label>
                           <Select value={serviceType} onValueChange={setServiceType}>
                             <SelectTrigger className="mt-1">
-                              <SelectValue placeholder="Select service" />
+                              <SelectValue placeholder={t('auth.selectService')} />
                             </SelectTrigger>
                             <SelectContent>
                               {serviceTypes.map((type) => (
@@ -526,10 +524,10 @@ const Auth = () => {
                         </div>
 
                         <div>
-                          <Label>City</Label>
+                          <Label>{t('auth.city')}</Label>
                           <Select value={city} onValueChange={setCity}>
                             <SelectTrigger className="mt-1">
-                              <SelectValue placeholder="Select city" />
+                              <SelectValue placeholder={t('auth.selectCity')} />
                             </SelectTrigger>
                             <SelectContent>
                               {cities.map((c) => (
@@ -543,7 +541,7 @@ const Auth = () => {
 
                       <div className="grid grid-cols-2 gap-4">
                         <div>
-                          <Label htmlFor="sp-experience">Experience (years)</Label>
+                          <Label htmlFor="sp-experience">{t('auth.experience')}</Label>
                           <Input
                             id="sp-experience"
                             type="number"
@@ -556,11 +554,11 @@ const Auth = () => {
                         </div>
 
                         <div>
-                          <Label htmlFor="sp-rate">Hourly Rate</Label>
+                          <Label htmlFor="sp-rate">{t('auth.hourlyRate')}</Label>
                           <Input
                             id="sp-rate"
                             type="text"
-                            placeholder="₹300/hr"
+                            placeholder={t('auth.placeholderRate')}
                             value={hourlyRate}
                             onChange={(e) => setHourlyRate(e.target.value)}
                             className="mt-1"
@@ -569,10 +567,10 @@ const Auth = () => {
                       </div>
 
                       <div>
-                        <Label htmlFor="sp-description">About You (optional)</Label>
+                        <Label htmlFor="sp-description">{t('auth.aboutYou')}</Label>
                         <Textarea
                           id="sp-description"
-                          placeholder="Tell customers about your experience and skills..."
+                          placeholder={t('auth.placeholderAbout')}
                           value={description}
                           onChange={(e) => setDescription(e.target.value)}
                           className="mt-1 resize-none"
@@ -581,7 +579,7 @@ const Auth = () => {
                       </div>
 
                       <div>
-                        <Label htmlFor="sp-password">Password</Label>
+                        <Label htmlFor="sp-password">{t('auth.password')}</Label>
                         <div className="relative mt-1">
                           <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                           <Input
@@ -598,7 +596,7 @@ const Auth = () => {
                       </div>
 
                       <Button type="submit" variant="accent" className="w-full" size="lg" disabled={isSubmitting}>
-                        {isSubmitting ? 'Creating account...' : 'Join as Professional'}
+                        {isSubmitting ? t('auth.creatingAccount') : t('auth.joinCta')}
                       </Button>
                     </form>
                   </motion.div>

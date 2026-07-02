@@ -6,6 +6,7 @@ const profileSchema = new mongoose.Schema(
     fullName: { type: String, required: true },
     email: { type: String },
     phone: { type: String, default: null },
+    language: { type: String, enum: ['en', 'hi', 'mr'], default: 'en' },
   },
   { timestamps: true }
 );

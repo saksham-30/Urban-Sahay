@@ -21,6 +21,8 @@ import {
 } from "lucide-react";
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
+import BackToDashboard from "@/components/BackToDashboard";
+import { useLanguage } from "@/hooks/useLanguage";
 
 interface ProviderProfile {
   _id: string;
@@ -50,6 +52,7 @@ const serviceCategories = [
 const ProviderProfile = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
+  const { t } = useLanguage();
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [profile, setProfile] = useState<ProviderProfile | null>(null);
@@ -108,9 +111,9 @@ const ProviderProfile = () => {
         city,
         serviceRadius,
       });
-      toast.success('Profile updated successfully!');
+      toast.success(t('providerProfile.updateSuccess'));
     } catch {
-      toast.error('Failed to save profile');
+      toast.error(t('providerProfile.updateFailed'));
     }
   };
 
@@ -137,11 +140,11 @@ const ProviderProfile = () => {
       </div>
       {verified ? (
         <Badge className="bg-emerald-500/20 text-emerald-700 border-0">
-          <CheckCircle className="w-3 h-3 mr-1" /> Verified
+          <CheckCircle className="w-3 h-3 mr-1" /> {t('providerProfile.verified')}
         </Badge>
       ) : (
         <Badge variant="secondary" className="bg-amber-500/20 text-amber-700 border-0">
-          <AlertCircle className="w-3 h-3 mr-1" /> Pending
+          <AlertCircle className="w-3 h-3 mr-1" /> {t('providerProfile.pending')}
         </Badge>
       )}
     </div>
@@ -171,6 +174,7 @@ const ProviderProfile = () => {
       <Header />
       <main className="pt-20 pb-12">
         <div className="container mx-auto px-4 max-w-4xl">
+          <BackToDashboard />
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -179,12 +183,12 @@ const ProviderProfile = () => {
             {/* Page Header */}
             <div className="flex items-center justify-between">
               <div>
-                <h1 className="text-2xl font-bold">Profile Management</h1>
-                <p className="text-muted-foreground">Manage your professional profile and settings</p>
+                <h1 className="text-2xl font-bold">{t('providerProfile.title')}</h1>
+                <p className="text-muted-foreground">{t('providerProfile.subtitle')}</p>
               </div>
               <Button onClick={handleSave} disabled={saving}>
                 <Save className="w-4 h-4 mr-2" />
-                {saving ? "Saving..." : "Save Changes"}
+                {saving ? t('providerProfile.saving') : t('providerProfile.saveChanges')}
               </Button>
             </div>
 
@@ -193,9 +197,9 @@ const ProviderProfile = () => {
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <User className="w-5 h-5 text-primary" />
-                  Profile Details
+                  {t('providerProfile.details')}
                 </CardTitle>
-                <CardDescription>Your professional information visible to customers</CardDescription>
+                <CardDescription>{t('providerProfile.detailsDesc')}</CardDescription>
               </CardHeader>
               <CardContent className="space-y-6">
                 {/* Profile Photo */}
@@ -211,8 +215,8 @@ const ProviderProfile = () => {
                     </button>
                   </div>
                   <div>
-                    <h3 className="font-semibold">Profile Photo</h3>
-                    <p className="text-sm text-muted-foreground">Upload a professional photo</p>
+                    <h3 className="font-semibold">{t('providerProfile.photo')}</h3>
+                    <p className="text-sm text-muted-foreground">{t('providerProfile.photoHint')}</p>
                   </div>
                 </div>
 
@@ -230,7 +234,7 @@ const ProviderProfile = () => {
 
                   {/* Experience */}
                   <div className="space-y-2">
-                    <Label htmlFor="experience">Experience (Years)</Label>
+                    <Label htmlFor="experience">{t('providerProfile.experienceYears')}</Label>
                     <Input 
                       id="experience" 
                       type="number"
@@ -265,7 +269,7 @@ const ProviderProfile = () => {
 
                 {/* Description */}
                 <div className="space-y-2">
-                  <Label htmlFor="description">Bio / Description</Label>
+                    <Label htmlFor="description">{t('providerProfile.description')}</Label>
                   <Textarea 
                     id="description" 
                     value={description} 
@@ -279,13 +283,13 @@ const ProviderProfile = () => {
                 <div className="grid gap-4 md:grid-cols-2">
                   <div className="p-4 rounded-lg border-2 border-dashed border-muted-foreground/30 flex flex-col items-center justify-center text-center">
                     <Briefcase className="w-8 h-8 text-muted-foreground/50 mb-2" />
-                    <span className="text-sm font-medium text-muted-foreground">Skills</span>
-                    <span className="text-xs text-muted-foreground/70">Coming soon</span>
+                    <span className="text-sm font-medium text-muted-foreground">{t('providerProfile.skills')}</span>
+                    <span className="text-xs text-muted-foreground/70">{t('providerProfile.comingSoon')}</span>
                   </div>
                   <div className="p-4 rounded-lg border-2 border-dashed border-muted-foreground/30 flex flex-col items-center justify-center text-center">
                     <Award className="w-8 h-8 text-muted-foreground/50 mb-2" />
-                    <span className="text-sm font-medium text-muted-foreground">Certifications</span>
-                    <span className="text-xs text-muted-foreground/70">Coming soon</span>
+                    <span className="text-sm font-medium text-muted-foreground">{t('providerProfile.certifications')}</span>
+                    <span className="text-xs text-muted-foreground/70">{t('providerProfile.comingSoon')}</span>
                   </div>
                 </div>
               </CardContent>
@@ -298,26 +302,26 @@ const ProviderProfile = () => {
                   <div>
                     <CardTitle className="flex items-center gap-2">
                       <Shield className="w-5 h-5 text-primary" />
-                      KYC Verification
+                      {t('providerProfile.kyc')}
                     </CardTitle>
-                    <CardDescription>Complete verification to build trust with customers</CardDescription>
+                    <CardDescription>{t('providerProfile.kycDesc')}</CardDescription>
                   </div>
                   {kycStatus?.isFullyVerified ? (
                     <Badge className="bg-emerald-500 text-white">
-                      <CheckCircle className="w-3 h-3 mr-1" /> Fully Verified
+                      <CheckCircle className="w-3 h-3 mr-1" /> {t('providerProfile.fullyVerified')}
                     </Badge>
                   ) : (
                     <Button variant="outline" size="sm" onClick={() => navigate("/kyc-verification")}>
-                      Complete KYC
+                      {t('providerProfile.completeKyc')}
                     </Button>
                   )}
                 </div>
               </CardHeader>
               <CardContent className="space-y-3">
-                <VerificationItem label="Email Verification" verified={kycStatus?.emailVerified ?? false} icon={Mail} />
-                <VerificationItem label="Phone Verification" verified={kycStatus?.phoneVerified ?? false} icon={Phone} />
-                <VerificationItem label="Aadhaar Verification" verified={kycStatus?.aadhaarVerified ?? false} icon={Fingerprint} />
-                <VerificationItem label="Selfie Verification" verified={kycStatus?.selfieVerified ?? false} icon={ScanFace} />
+                <VerificationItem label={t('providerProfile.emailVerification')} verified={kycStatus?.emailVerified ?? false} icon={Mail} />
+                <VerificationItem label={t('providerProfile.phoneVerification')} verified={kycStatus?.phoneVerified ?? false} icon={Phone} />
+                <VerificationItem label={t('providerProfile.aadhaarVerification')} verified={kycStatus?.aadhaarVerified ?? false} icon={Fingerprint} />
+                <VerificationItem label={t('providerProfile.selfieVerification')} verified={kycStatus?.selfieVerified ?? false} icon={ScanFace} />
               </CardContent>
             </Card>
 
@@ -326,17 +330,17 @@ const ProviderProfile = () => {
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <Settings className="w-5 h-5 text-primary" />
-                  Service Settings
+                  {t('providerProfile.serviceSettings')}
                 </CardTitle>
-                <CardDescription>Configure your service preferences</CardDescription>
+                <CardDescription>{t('providerProfile.serviceSettingsDesc')}</CardDescription>
               </CardHeader>
               <CardContent className="space-y-6">
                 {/* Service Category */}
                 <div className="space-y-2">
-                  <Label>Service Category</Label>
+                  <Label>{t('providerProfile.serviceCategory')}</Label>
                   <Select value={serviceType} onValueChange={setServiceType}>
                     <SelectTrigger>
-                      <SelectValue placeholder="Select your service category" />
+                      <SelectValue placeholder={t('providerProfile.selectServiceCategory')} />
                     </SelectTrigger>
                     <SelectContent>
                       {serviceCategories.map((cat) => (
@@ -350,12 +354,12 @@ const ProviderProfile = () => {
                 <div className="space-y-2">
                   <Label className="flex items-center gap-2">
                     <DollarSign className="w-4 h-4" />
-                    Hourly Rate
+                    {t('providerProfile.hourlyRateInr')}
                   </Label>
                   <Input 
                     value={hourlyRate} 
                     onChange={(e) => setHourlyRate(e.target.value)}
-                    placeholder="e.g., ₹500 - ₹1000"
+                    placeholder={t('providerProfile.rateExample')}
                   />
                 </div>
 
@@ -364,7 +368,7 @@ const ProviderProfile = () => {
                   <div className="flex items-center justify-between">
                     <Label className="flex items-center gap-2">
                       <MapPin className="w-4 h-4" />
-                      Service Radius
+                      {t('providerProfile.serviceRadius')}
                     </Label>
                     <span className="text-lg font-bold text-primary">{serviceRadius} km</span>
                   </div>

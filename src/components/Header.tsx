@@ -9,6 +9,7 @@ import KYCBanner from "@/components/KYCBanner";
 import ProfileDropdown from "@/components/ProfileDropdown";
 import { motion, AnimatePresence } from "framer-motion";
 import ModeToggle from "@/components/ModeToggle";
+import { useLanguage } from "@/hooks/useLanguage";
 
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -16,11 +17,12 @@ const Header = () => {
   const location = useLocation();
   const { user, isLoading } = useAuth();
   const { mode } = useAppMode();
+  const { t } = useLanguage();
   const isHome = location.pathname === "/";
 
   const navLinks = [
-    { label: "Services", href: isHome ? "#services" : "/services", isRoute: !isHome },
-    { label: "How It Works", href: isHome ? "#how-it-works" : "/#how-it-works", isRoute: !isHome },
+    { label: t("header.services"), href: isHome ? "#services" : "/services", isRoute: !isHome },
+    { label: t("header.howItWorks"), href: isHome ? "#how-it-works" : "/#how-it-works", isRoute: !isHome },
   ];
 
   const handleNavClick = (link: { href: string; isRoute: boolean }, closeMobile?: boolean) => {
@@ -76,7 +78,7 @@ const Header = () => {
                 onClick={() => navigate("/kyc-verification")}
               >
                 <ShieldCheck className="w-4 h-4" />
-                e-KYC
+                {t("header.ekyc")}
               </Button>
             )}
             {user && mode === "customer" && (
@@ -87,7 +89,7 @@ const Header = () => {
                 onClick={() => navigate("/my-requests")}
               >
                 <ClipboardList className="w-4 h-4" />
-                My Requests
+                {t("header.myRequests")}
               </Button>
             )}
             {user && mode === "provider" && (
@@ -98,7 +100,7 @@ const Header = () => {
                 onClick={() => navigate("/provider-jobs")}
               >
                 <Briefcase className="w-4 h-4" />
-                My Jobs
+                {t("header.myJobs")}
               </Button>
             )}
             {user && <NotificationBell />}
@@ -109,10 +111,10 @@ const Header = () => {
             ) : (
               <>
                 <Button variant="ghost" size="sm" onClick={() => navigate("/auth")}>
-                  Sign In
+                  {t("header.signIn")}
                 </Button>
                 <Button variant="default" size="sm" onClick={() => navigate("/auth")}>
-                  Get Started
+                  {t("header.getStarted")}
                 </Button>
               </>
             )}
@@ -125,7 +127,7 @@ const Header = () => {
               <button
                 className="p-2 text-primary relative"
                 onClick={() => navigate("/kyc-verification")}
-                title="e-KYC Verification"
+                title={t("header.ekycVerification")}
               >
                 <ShieldCheck className="w-5 h-5" />
               </button>
@@ -198,10 +200,10 @@ const Header = () => {
               {!user && (
                 <div className="flex flex-col gap-2 pt-3 mt-1 border-t border-border">
                   <Button variant="ghost" className="w-full justify-start" onClick={() => { setIsMenuOpen(false); navigate("/auth"); }}>
-                    Sign In
+                    {t("header.signIn")}
                   </Button>
                   <Button variant="default" className="w-full" onClick={() => { setIsMenuOpen(false); navigate("/auth"); }}>
-                    Get Started
+                    {t("header.getStarted")}
                   </Button>
                 </div>
               )}

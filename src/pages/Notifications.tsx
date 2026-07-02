@@ -6,6 +6,7 @@ import { useNavigate } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import { Bell, CheckCircle2, Clock, ShieldAlert, Info } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
+import { useLanguage } from '@/hooks/useLanguage';
 
 const notifications = [
   { id: 1, title: 'KYC Verification Pending', message: 'Complete your identity verification to access all services.', type: 'warning', time: '2 hours ago', read: false },
@@ -20,6 +21,7 @@ const Notifications = () => {
   const { user, isLoading } = useAuth();
   const navigate = useNavigate();
   const [items, setItems] = useState(notifications);
+  const { t } = useLanguage();
 
   useEffect(() => { if (!isLoading && !user) navigate('/auth'); }, [user, isLoading, navigate]);
 
@@ -32,10 +34,10 @@ const Notifications = () => {
         <BackToDashboard />
         <div className="flex items-center justify-between mb-6">
           <div>
-            <h1 className="text-2xl font-bold text-foreground">Notifications</h1>
-            <p className="text-muted-foreground text-sm">Stay updated on your activity</p>
+            <h1 className="text-2xl font-bold text-foreground">{t('notifications.title')}</h1>
+            <p className="text-muted-foreground text-sm">{t('notifications.subtitle')}</p>
           </div>
-          <button onClick={markAllRead} className="text-sm text-primary hover:underline">Mark all read</button>
+          <button onClick={markAllRead} className="text-sm text-primary hover:underline">{t('notifications.markAllRead')}</button>
         </div>
         <div className="space-y-3">
           {items.map(n => {

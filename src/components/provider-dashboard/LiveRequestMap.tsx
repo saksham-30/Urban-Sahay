@@ -4,8 +4,8 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { MapPin, Radio, Clock, AlertTriangle, ChevronRight, Locate, X, Phone, MessageCircle, Radar, ArrowUpDown } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
-import { supabase } from "@/integrations/supabase/client";
 import { useGeolocation } from "@/hooks/useGeolocation";
+import { api } from "@/lib/api";
 import { useNavigate } from "react-router-dom";
 
 interface ServiceRequest {
@@ -63,29 +63,85 @@ const LiveRequestMap = ({ serviceRadius = 10 }: Props) => {
   const center = userLocation || fallbackCenter;
 
   const fetchRequests = async () => {
-    const { data } = await supabase
-      .from("concerns")
-      .select("id, name, location, service_type, urgency, created_at, status, phone, concern")
-      .eq("status", "pending")
-      .order("created_at", { ascending: false })
-      .limit(10);
-    if (data) setRequests(data);
+    try {
+      const data = await api.getConcerns();
+      // Filter to only open/active concerns and map fields
+      const activeConcerns = (Array.isArray(data) ? data : [])
+        .filter((c: any) => c.status === "open")
+        .map((c: any) => ({
+          id: c._id,
+          name: c.name,
+          location: c.location,
+          service_type: c.serviceType,
+          urgency: c.urgency || "medium",
+          created_at: c.createdAt,
+          status: c.status,
+          phone: c.phone,
+          concern: c.concern,
+        }));
+      setRequests(activeConcerns.length ? activeConcerns : demoRequests);
+    } catch (error) {
+      console.error("Failed to fetch requests:", error);
+      setRequests(demoRequests);
+    }
     setLoading(false);
   };
+
+  // Demo fallback requests (used when backend returns none)
+  const demoRequests: ServiceRequest[] = [
+    {
+      id: "demo-1",
+      name: "Ramesh Kumar",
+      location: "Kothrud, Pune",
+      service_type: "Plumbing - Leak Repair",
+      urgency: "high",
+      created_at: new Date(Date.now() - 2 * 60000).toISOString(),
+      status: "open",
+      phone: "+91-90000-00001",
+      concern: "Water leaking from under the sink, needs urgent fix.",
+    },
+    {
+      id: "demo-2",
+      name: "Sunita Joshi",
+      location: "Deccan, Pune",
+      service_type: "Electrical - Short Circuit",
+      urgency: "medium",
+      created_at: new Date(Date.now() - 8 * 60000).toISOString(),
+      status: "open",
+      phone: "+91-90000-00002",
+      concern: "Fuse keeps tripping when switching on the geyser.",
+    },
+    {
+      id: "demo-3",
+      name: "Amit Patil",
+      location: "Baner, Pune",
+      service_type: "Carpentry - Door Repair",
+      urgency: "low",
+      created_at: new Date(Date.now() - 20 * 60000).toISOString(),
+      status: "open",
+      phone: "+91-90000-00003",
+      concern: "Loose hinges on main door, needs tightening and screws.",
+    },
+    {
+      id: "demo-4",
+      name: "Pooja Mehta",
+      location: "Koregaon Park, Pune",
+      service_type: "Cleaning - Drain Cleaning",
+      urgency: "medium",
+      created_at: new Date(Date.now() - 35 * 60000).toISOString(),
+      status: "open",
+      phone: "+91-90000-00004",
+      concern: "Water not draining properly from kitchen sink.",
+    },
+  ];
 
   useEffect(() => {
     fetchRequests();
 
-    const channel = supabase
-      .channel("live-requests")
-      .on(
-        "postgres_changes",
-        { event: "*", schema: "public", table: "concerns" },
-        () => fetchRequests()
-      )
-      .subscribe();
+    // Poll for updates every 5 seconds
+    const interval = setInterval(fetchRequests, 5000);
 
-    return () => { supabase.removeChannel(channel); };
+    return () => clearInterval(interval);
   }, []);
 
   // Attach simulated distance to each request

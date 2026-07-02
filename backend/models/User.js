@@ -17,7 +17,7 @@ userSchema.pre('save', async function (next) {
 });
 
 userSchema.methods.comparePassword = function (candidate) {
-  return bcrypt.compare(candidate, this.password);
+  return bcrypt.compare(candidate, this.password).catch(() => false);
 };
 
 // Never expose password in responses

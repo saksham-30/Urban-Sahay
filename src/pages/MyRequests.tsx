@@ -30,6 +30,7 @@ import ScheduledBookingsSection from "@/components/ScheduledBookingsSection";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { motion, AnimatePresence } from "framer-motion";
 import { toast } from "@/hooks/use-toast";
+import { useLanguage } from '@/hooks/useLanguage';
 
 type JobStatus = "accepted" | "on_the_way" | "arrived" | "working" | "completed";
 
@@ -59,12 +60,12 @@ interface PastRequest {
   rated: boolean;
 }
 
-const statusSteps: { key: JobStatus; label: string; icon: React.ElementType }[] = [
-  { key: "accepted", label: "Accepted", icon: CheckCircle2 },
-  { key: "on_the_way", label: "On the Way", icon: Navigation },
-  { key: "arrived", label: "Arrived", icon: MapPin },
-  { key: "working", label: "Working", icon: Wrench },
-  { key: "completed", label: "Completed", icon: Star },
+const statusSteps: { key: JobStatus; labelKey: string; icon: React.ElementType }[] = [
+  { key: "accepted", labelKey: 'status.accepted', icon: CheckCircle2 },
+  { key: "on_the_way", labelKey: 'status.onTheWay', icon: Navigation },
+  { key: "arrived", labelKey: 'status.arrived', icon: MapPin },
+  { key: "working", labelKey: 'status.working', icon: Wrench },
+  { key: "completed", labelKey: 'status.completed', icon: Star },
 ];
 
 const mockActiveJob: ActiveJob = {
@@ -91,6 +92,7 @@ const mockPastRequests: PastRequest[] = [
 const MyRequests = () => {
   const { user, isLoading } = useAuth();
   const navigate = useNavigate();
+  const { t } = useLanguage();
   const [activeJob, setActiveJob] = useState<ActiveJob | null>(mockActiveJob);
   const [showOtp, setShowOtp] = useState(false);
   const [showCancelDialog, setShowCancelDialog] = useState(false);
@@ -115,8 +117,8 @@ const MyRequests = () => {
       const nextStatus = statusSteps[idx + 1].key;
       setActiveJob({ ...activeJob, status: nextStatus });
       toast({
-        title: `Status: ${statusSteps[idx + 1].label}`,
-        description: `${activeJob.provider} is now ${statusSteps[idx + 1].label.toLowerCase()}.`,
+        title: `Status: ${t(statusSteps[idx + 1].labelKey)}`,
+        description: `${activeJob.provider} is now ${t(statusSteps[idx + 1].labelKey).toLowerCase()}.`,
       });
     }
   };
@@ -139,15 +141,15 @@ const MyRequests = () => {
         <BackToDashboard />
         <h1 className="text-2xl font-bold text-foreground mb-1 flex items-center gap-2">
           <ClipboardList className="w-6 h-6 text-primary" />
-          My Requests
+          {t('myRequests.title')}
         </h1>
-        <p className="text-muted-foreground mb-6">Track your active and past service requests</p>
+        <p className="text-muted-foreground mb-6">{t('myRequests.subtitle')}</p>
 
         <Tabs defaultValue="active" className="w-full">
-          <TabsList className="w-full mb-6">
-            <TabsTrigger value="active" className="flex-1">Active</TabsTrigger>
-            <TabsTrigger value="scheduled" className="flex-1">Scheduled</TabsTrigger>
-            <TabsTrigger value="past" className="flex-1">Past</TabsTrigger>
+            <TabsList className="w-full mb-6">
+            <TabsTrigger value="active" className="flex-1">{t('tabs.active')}</TabsTrigger>
+            <TabsTrigger value="scheduled" className="flex-1">{t('tabs.scheduled')}</TabsTrigger>
+            <TabsTrigger value="past" className="flex-1">{t('tabs.past')}</TabsTrigger>
           </TabsList>
 
           <TabsContent value="active">
@@ -164,10 +166,10 @@ const MyRequests = () => {
                       <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75" />
                       <span className="relative inline-flex rounded-full h-3 w-3 bg-primary" />
                     </span>
-                    <h2 className="text-lg font-bold text-foreground">Active Job</h2>
+                    <h2 className="text-lg font-bold text-foreground">{t('activeJob.title')}</h2>
                   </div>
                   <Badge className="bg-primary/10 text-primary border-primary/30">
-                    {statusSteps[currentStepIndex]?.label}
+                    {t(statusSteps[currentStepIndex]?.labelKey ?? '')}
                   </Badge>
                 </div>
 
@@ -224,7 +226,7 @@ const MyRequests = () => {
                             <step.icon className="w-4 h-4" />
                           </div>
                           <span className={`text-[10px] font-medium ${isActive ? "text-primary" : "text-muted-foreground"}`}>
-                            {step.label}
+                            {t(step.labelKey)}
                           </span>
                         </div>
                       );
@@ -236,17 +238,17 @@ const MyRequests = () => {
                 <div className="grid grid-cols-3 gap-3 mb-4">
                   <div className="bg-muted/50 rounded-lg p-3 text-center">
                     <Clock className="w-4 h-4 mx-auto text-primary mb-1" />
-                    <p className="text-xs text-muted-foreground">ETA</p>
+                    <p className="text-xs text-muted-foreground">{t('eta')}</p>
                     <p className="text-sm font-semibold text-foreground">{activeJob.estimatedArrival} min</p>
                   </div>
                   <div className="bg-muted/50 rounded-lg p-3 text-center">
                     <MapPin className="w-4 h-4 mx-auto text-primary mb-1" />
-                    <p className="text-xs text-muted-foreground">Visiting</p>
+                    <p className="text-xs text-muted-foreground">{t('visiting')}</p>
                     <p className="text-sm font-semibold text-foreground">{activeJob.visitingCharge}</p>
                   </div>
                   <div className="bg-muted/50 rounded-lg p-3 text-center">
                     <Clock className="w-4 h-4 mx-auto text-primary mb-1" />
-                    <p className="text-xs text-muted-foreground">Booked</p>
+                    <p className="text-xs text-muted-foreground">{t('booked')}</p>
                     <p className="text-sm font-semibold text-foreground">{activeJob.bookedAt}</p>
                   </div>
                 </div>
@@ -257,10 +259,10 @@ const MyRequests = () => {
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-2">
                         <ShieldCheck className="w-5 h-5 text-primary" />
-                        <span className="text-sm font-semibold text-foreground">Verification OTP</span>
+                        <span className="text-sm font-semibold text-foreground">{t('otp.title')}</span>
                       </div>
                       <Button variant="ghost" size="sm" onClick={() => setShowOtp(!showOtp)}>
-                        {showOtp ? "Hide" : "Show"}
+                        {showOtp ? t('otp.hide') : t('otp.show')}
                       </Button>
                     </div>
                     <AnimatePresence>
@@ -297,11 +299,11 @@ const MyRequests = () => {
                 ) : activeJob.status === "working" ? (
                   <div className="space-y-2">
                     <Button className="w-full" onClick={handleSimulateNext}>
-                      Simulate Next Step
+                      {t('actions.simulateNext')}
                       <ChevronRight className="w-4 h-4 ml-1" />
                     </Button>
                     <p className="text-xs text-center text-muted-foreground">
-                      Cancellation is not available once work has started.
+                      {t('cancellation.notAvailable')}
                     </p>
                   </div>
                 ) : (
@@ -310,16 +312,16 @@ const MyRequests = () => {
                       <div className="w-16 h-16 mx-auto rounded-full bg-primary/10 flex items-center justify-center">
                         <CheckCircle2 className="w-8 h-8 text-primary" />
                       </div>
-                      <h3 className="font-bold text-foreground">Service Completed!</h3>
-                      <p className="text-sm text-muted-foreground">Rate your experience with {activeJob.provider}</p>
+                      <h3 className="font-bold text-foreground">{t('service.completed')}</h3>
+                      <p className="text-sm text-muted-foreground">{t('service.ratePrompt').replace('{provider}', activeJob.provider)}</p>
                     </div>
                     <PhotoProofSection />
                     <div className="flex gap-2">
                       <Button className="flex-1" onClick={() => { toast({ title: "Thank you!", description: "Your review has been submitted." }); setActiveJob(null); setConsecutiveCancellations(0); }}>
-                        <Star className="w-4 h-4 mr-1" /> Rate & Review
+                        <Star className="w-4 h-4 mr-1" /> {t('actions.rateReview')}
                       </Button>
                       <Button variant="outline" className="flex-1" onClick={() => { setActiveJob(null); setConsecutiveCancellations(0); }}>
-                        Skip
+                        {t('actions.skip')}
                       </Button>
                     </div>
                   </div>
@@ -328,8 +330,8 @@ const MyRequests = () => {
             ) : (
               <div className="text-center py-10 text-muted-foreground">
                 <ClipboardList className="w-10 h-10 mx-auto mb-3 opacity-50" />
-                <p className="font-medium">No active jobs</p>
-                <p className="text-sm">Book a service to see live tracking here.</p>
+                <p className="font-medium">{t('noActiveJobs')}</p>
+                <p className="text-sm">{t('bookServiceHint')}</p>
               </div>
             )}
           </TabsContent>

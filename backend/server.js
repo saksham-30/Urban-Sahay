@@ -46,6 +46,14 @@ connectDB();
 app.use(cors(corsOptions));
 app.use(express.json());
 
+app.get('/', (_req, res) => {
+  res.json({ message: 'Urban Sahay backend is running.' });
+});
+
+app.get('/health', (_req, res) => {
+  res.json({ status: 'ok' });
+});
+
 // Routes
 app.use('/api/auth', authRoutes);
 app.use('/api/users', userRoutes);

@@ -7,6 +7,7 @@ const serviceProviderSchema = new mongoose.Schema(
     serviceType: { type: String, required: true },
     city: { type: String, required: true },
     phone: { type: String, required: true },
+    language: { type: String, enum: ['en', 'hi', 'mr'], default: 'en' },
     description: { type: String, default: null },
     experienceYears: { type: Number, default: null },
     hourlyRate: { type: String, default: null },

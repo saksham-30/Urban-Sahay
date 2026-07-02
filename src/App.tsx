@@ -6,8 +6,11 @@ import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
 import { useEffect } from "react";
 import { AuthProvider } from "@/hooks/useAuth";
 import { AppModeProvider } from "@/hooks/useAppMode";
+import { LanguageProvider } from "@/hooks/useLanguage";
 import Index from "./pages/Index";
 import ProviderDashboard from "./pages/ProviderDashboard";
+import ProviderPerformance from "./pages/ProviderPerformance";
+import ProviderAchievements from "./pages/ProviderAchievements";
 import ProviderProfile from "./pages/ProviderProfile";
 import ProviderJobs from "./pages/ProviderJobs";
 import Auth from "./pages/Auth";
@@ -54,37 +57,41 @@ const App = () => (
   <QueryClientProvider client={queryClient}>
     <BrowserRouter>
       <AuthProvider>
-        <AppModeProvider>
-          <TooltipProvider>
-          <Toaster />
-          <Sonner />
-          <ScrollToTop />
-          <Routes>
-            <Route path="/" element={<Index />} />
-            <Route path="/provider-dashboard" element={<ProviderDashboard />} />
-            <Route path="/provider-profile" element={<ProviderProfile />} />
-            <Route path="/provider-jobs" element={<ProviderJobs />} />
-            <Route path="/auth" element={<Auth />} />
-            <Route path="/services" element={<ServiceCategories />} />
-            <Route path="/services/:category" element={<ServiceAvailability />} />
-            <Route path="/service-availability/:category" element={<ServiceAvailability />} />
-            <Route path="/raise-concern/:category" element={<RaiseConcernPage />} />
-            <Route path="/provider-results" element={<ProviderResults />} />
-            <Route path="/kyc-verification" element={<KYCVerification />} />
-            <Route path="/profile" element={<Profile />} />
-            <Route path="/my-requests" element={<MyRequests />} />
-            <Route path="/service-history" element={<ServiceHistory />} />
-            <Route path="/my-reviews" element={<MyReviews />} />
-            <Route path="/notifications" element={<Notifications />} />
-            <Route path="/settings" element={<SettingsPage />} />
-            <Route path="/support" element={<Support />} />
-            <Route path="/chat" element={<ChatPage />} />
-            <Route path="*" element={<NotFound />} />
-          </Routes>
-          <ConditionalAIChatbot />
-          <ConditionalSOSButton />
-          </TooltipProvider>
-        </AppModeProvider>
+        <LanguageProvider>
+          <AppModeProvider>
+            <TooltipProvider>
+            <Toaster />
+            <Sonner />
+            <ScrollToTop />
+            <Routes>
+              <Route path="/" element={<Index />} />
+              <Route path="/provider-dashboard" element={<ProviderDashboard />} />
+              <Route path="/provider-performance" element={<ProviderPerformance />} />
+              <Route path="/provider-achievements" element={<ProviderAchievements />} />
+              <Route path="/provider-profile" element={<ProviderProfile />} />
+              <Route path="/provider-jobs" element={<ProviderJobs />} />
+              <Route path="/auth" element={<Auth />} />
+              <Route path="/services" element={<ServiceCategories />} />
+              <Route path="/services/:category" element={<ServiceAvailability />} />
+              <Route path="/service-availability/:category" element={<ServiceAvailability />} />
+              <Route path="/raise-concern/:category" element={<RaiseConcernPage />} />
+              <Route path="/provider-results" element={<ProviderResults />} />
+              <Route path="/kyc-verification" element={<KYCVerification />} />
+              <Route path="/profile" element={<Profile />} />
+              <Route path="/my-requests" element={<MyRequests />} />
+              <Route path="/service-history" element={<ServiceHistory />} />
+              <Route path="/my-reviews" element={<MyReviews />} />
+              <Route path="/notifications" element={<Notifications />} />
+              <Route path="/settings" element={<SettingsPage />} />
+              <Route path="/support" element={<Support />} />
+              <Route path="/chat" element={<ChatPage />} />
+              <Route path="*" element={<NotFound />} />
+            </Routes>
+            <ConditionalAIChatbot />
+            <ConditionalSOSButton />
+            </TooltipProvider>
+          </AppModeProvider>
+        </LanguageProvider>
       </AuthProvider>
     </BrowserRouter>
   </QueryClientProvider>

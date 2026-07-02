@@ -1,31 +1,33 @@
 import { MapPin, Mail, Phone, Facebook, Twitter, Instagram, Linkedin } from "lucide-react";
 import { motion } from "framer-motion";
 import SectionReveal from "@/components/SectionReveal";
+import { useLanguage } from "@/hooks/useLanguage";
 
 const Footer = () => {
   const currentYear = new Date().getFullYear();
+  const { t } = useLanguage();
 
   const footerLinks = {
     services: [
-      { label: "Plumbers", href: "#" },
-      { label: "Electricians", href: "#" },
-      { label: "Doctors", href: "#" },
-      { label: "Cleaners", href: "#" },
-      { label: "Painters", href: "#" },
+      { label: t('footer.plumbers'), href: "#" },
+      { label: t('footer.electricians'), href: "#" },
+      { label: t('footer.doctors'), href: "#" },
+      { label: t('footer.cleaners'), href: "#" },
+      { label: t('footer.painters'), href: "#" },
     ],
     company: [
-      { label: "About Us", href: "#about" },
-      { label: "How It Works", href: "#how-it-works" },
-      { label: "Become a Partner", href: "#" },
-      { label: "Careers", href: "#" },
-      { label: "Contact", href: "#" },
+      { label: t('footer.about'), href: "#about" },
+      { label: t('footer.howItWorks'), href: "#how-it-works" },
+      { label: t('footer.partner'), href: "#" },
+      { label: t('footer.careers'), href: "#" },
+      { label: t('footer.contact'), href: "#" },
     ],
     support: [
-      { label: "Help Center", href: "#" },
-      { label: "Safety", href: "#" },
-      { label: "Terms of Service", href: "#" },
-      { label: "Privacy Policy", href: "#" },
-      { label: "FAQs", href: "#" },
+      { label: t('footer.helpCenter'), href: "#" },
+      { label: t('footer.safety'), href: "#" },
+      { label: t('footer.terms'), href: "#" },
+      { label: t('footer.privacy'), href: "#" },
+      { label: t('footer.faqs'), href: "#" },
     ],
   };
 
@@ -51,8 +53,7 @@ const Footer = () => {
               </span>
             </div>
             <p className="text-background/60 mb-6 max-w-sm leading-relaxed">
-              Connecting you with trusted local service providers. 
-              New to the city? We've got your back with verified professionals for all your needs.
+              {t('footer.tagline')}
             </p>
             <div className="space-y-2 text-sm">
               <div className="flex items-center gap-2 group">
@@ -68,7 +69,7 @@ const Footer = () => {
 
           {/* Services */}
           <SectionReveal delay={0.1}>
-            <h4 className="text-background font-semibold mb-4">Services</h4>
+            <h4 className="text-background font-semibold mb-4">{t('footer.services')}</h4>
             <ul className="space-y-2.5">
               {footerLinks.services.map((link) => (
                 <li key={link.label}>
@@ -82,7 +83,7 @@ const Footer = () => {
 
           {/* Company */}
           <SectionReveal delay={0.2}>
-            <h4 className="text-background font-semibold mb-4">Company</h4>
+            <h4 className="text-background font-semibold mb-4">{t('footer.company')}</h4>
             <ul className="space-y-2.5">
               {footerLinks.company.map((link) => (
                 <li key={link.label}>
@@ -96,7 +97,7 @@ const Footer = () => {
 
           {/* Support */}
           <SectionReveal delay={0.3}>
-            <h4 className="text-background font-semibold mb-4">Support</h4>
+            <h4 className="text-background font-semibold mb-4">{t('footer.support')}</h4>
             <ul className="space-y-2.5">
               {footerLinks.support.map((link) => (
                 <li key={link.label}>
@@ -112,7 +113,7 @@ const Footer = () => {
         {/* Bottom */}
         <div className="mt-12 pt-8 border-t border-background/10 flex flex-col md:flex-row items-center justify-between gap-4">
           <p className="text-sm text-background/50">
-            © {currentYear} Urban Sahay. All rights reserved.
+            © {currentYear} Urban Sahay. {t('footer.rights')}
           </p>
           <div className="flex items-center gap-3">
             {socialLinks.map((social) => (

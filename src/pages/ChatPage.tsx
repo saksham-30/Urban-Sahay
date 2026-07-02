@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { useAuth } from "@/hooks/useAuth";
-import { api } from "@/lib/api";
+import { useLanguage } from "@/hooks/useLanguage";
+import { API_ORIGIN, api } from "@/lib/api";
 import { io, Socket } from "socket.io-client";
 import { useSearchParams, useNavigate } from "react-router-dom";
 import Header from "@/components/Header";
@@ -65,13 +66,7 @@ function toUiMessage(m: any): Message {
   };
 }
 
-const quickActions = [
-  { label: "I'm on the way", icon: MapPin, color: "text-blue-500" },
-  { label: "I've arrived at your location", icon: MapPin, color: "text-emerald-500" },
-  { label: "Starting the work now", icon: Wrench, color: "text-amber-500" },
-  { label: "Job completed! Please review", icon: CheckCheck, color: "text-emerald-500" },
-  { label: "Need more details about the issue", icon: MessageCircle, color: "text-primary" },
-];
+// quickActions will be defined inside the component to use translations
 
 const ChatPage = () => {
   const { user } = useAuth();
@@ -87,14 +82,23 @@ const ChatPage = () => {
   const [loading, setLoading] = useState(true);
   const [sending, setSending] = useState(false);
   const [showQuickActions, setShowQuickActions] = useState(false);
-  const [otherUserName, setOtherUserName] = useState("Chat");
+  const [otherUserName, setOtherUserName] = useState<string>(() => "Chat");
+  const { t } = useLanguage();
+
+  const quickActions = [
+    { labelKey: 'chat.quick.onTheWay', icon: MapPin, color: 'text-blue-500' },
+    { labelKey: 'chat.quick.arrived', icon: MapPin, color: 'text-emerald-500' },
+    { labelKey: 'chat.quick.starting', icon: Wrench, color: 'text-amber-500' },
+    { labelKey: 'chat.quick.completed', icon: CheckCheck, color: 'text-emerald-500' },
+    { labelKey: 'chat.quick.needDetails', icon: MessageCircle, color: 'text-primary' },
+  ];
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const socketRef = useRef<Socket | null>(null);
 
   // Socket.io connection
   useEffect(() => {
-    const socket = io(import.meta.env.VITE_API_URL?.replace('/api', '') || 'http://localhost:5000');
+    const socket = io(API_ORIGIN);
     socketRef.current = socket;
     return () => { socket.disconnect(); };
   }, []);
@@ -181,7 +185,7 @@ const ChatPage = () => {
         return [...prev, uiMsg];
       });
     } catch {
-      toast.error('Failed to send message');
+      toast.error(t('chat.sendFailed'));
     }
 
     setNewMessage("");
@@ -197,7 +201,7 @@ const ChatPage = () => {
     const filePath = `chat/${user.id}/${Date.now()}.${fileExt}`;
 
     // For now, create a placeholder URL since we'd need a storage bucket
-    toast.info("Image sharing will be available once storage is configured");
+    toast.info(t('chat.imageUnavailable'));
   };
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
@@ -225,7 +229,7 @@ const ChatPage = () => {
       <div className="min-h-screen bg-background">
         <Header />
         <main className="pt-20 pb-12 container mx-auto px-4">
-          <p className="text-center text-muted-foreground mt-20">Please log in to access chat.</p>
+          <p className="text-center text-muted-foreground mt-20">{t('chat.loginRequired')}</p>
         </main>
         <Footer />
       </div>
@@ -245,7 +249,7 @@ const ChatPage = () => {
               <div className="px-4 py-3 border-b border-border/20">
                 <h3 className="font-bold text-foreground flex items-center gap-2">
                   <MessageCircle className="w-4 h-4 text-primary" />
-                  Conversations
+                  {t('chat.conversations')}
                 </h3>
               </div>
               <ScrollArea className="flex-1">
@@ -257,7 +261,7 @@ const ChatPage = () => {
                   </div>
                 ) : conversations.length === 0 ? (
                   <div className="p-6 text-center text-sm text-muted-foreground">
-                    No conversations yet
+                    {t('chat.noConversations')}
                   </div>
                 ) : (
                   <div className="p-2 space-y-1">
@@ -280,7 +284,7 @@ const ChatPage = () => {
                           </Avatar>
                           <div className="flex-1 min-w-0">
                             <p className="text-sm font-medium text-foreground truncate">
-                              {conv.job_context || "Chat"}
+                              {conv.job_context || t('chat.conversations')}
                             </p>
                             <p className="text-[10px] text-muted-foreground">
                               {new Date(conv.updated_at).toLocaleDateString()}
@@ -320,7 +324,7 @@ const ChatPage = () => {
                     </Avatar>
                     <div className="flex-1">
                       <h3 className="text-sm font-bold text-foreground">{otherUserName}</h3>
-                      <p className="text-[10px] text-emerald-500 font-medium">Online</p>
+                      <p className="text-[10px] text-emerald-500 font-medium">{t('chat.online')}</p>
                     </div>
                   </div>
 
@@ -348,7 +352,7 @@ const ChatPage = () => {
                               >
                                 {msg.is_auto && (
                                   <Badge variant="outline" className="mb-1 text-[9px] border-amber-500/30 text-amber-600">
-                                    Auto
+                                    {t('chat.autoTag')}
                                   </Badge>
                                 )}
                                 {msg.image_url && (
@@ -390,12 +394,12 @@ const ChatPage = () => {
                             const Icon = action.icon;
                             return (
                               <button
-                                key={action.label}
-                                onClick={() => sendMessage(action.label, true)}
+                                key={action.labelKey}
+                                onClick={() => sendMessage(t(action.labelKey), true)}
                                 className="flex items-center gap-2 px-3 py-2 rounded-lg text-sm text-foreground hover:bg-muted/50 transition-colors text-left"
                               >
                                 <Icon className={`w-4 h-4 flex-shrink-0 ${action.color}`} />
-                                {action.label}
+                                {t(action.labelKey)}
                               </button>
                             );
                           })}
@@ -409,7 +413,7 @@ const ChatPage = () => {
                     <button
                       onClick={() => setShowQuickActions(!showQuickActions)}
                       className={`p-2 rounded-lg transition-colors ${showQuickActions ? "bg-primary/10 text-primary" : "hover:bg-muted/50 text-muted-foreground"}`}
-                      title="Quick actions"
+                      title={t('chat.quickActionsTitle')}
                     >
                       <Smile className="w-5 h-5" />
                     </button>
@@ -423,7 +427,7 @@ const ChatPage = () => {
                     <button
                       onClick={() => fileInputRef.current?.click()}
                       className="p-2 rounded-lg hover:bg-muted/50 text-muted-foreground transition-colors"
-                      title="Share image"
+                      title={t('chat.shareImage')}
                     >
                       <ImageIcon className="w-5 h-5" />
                     </button>
@@ -431,7 +435,7 @@ const ChatPage = () => {
                       value={newMessage}
                       onChange={(e) => setNewMessage(e.target.value)}
                       onKeyDown={handleKeyPress}
-                      placeholder="Type a message..."
+                      placeholder={t('chat.typePlaceholder')}
                       className="flex-1 border-border/30 bg-muted/30 focus-visible:ring-primary/30"
                     />
                     <Button

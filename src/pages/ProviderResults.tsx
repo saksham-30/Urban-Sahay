@@ -3,11 +3,19 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { Star, MapPin, IndianRupee, ArrowLeft, BadgeCheck, Loader2, ArrowDownUp } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import {
+  Select,
+  SelectTrigger,
+  SelectValue,
+  SelectContent,
+  SelectItem,
+} from "@/components/ui/select";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import LocationMap from "@/components/LocationMap";
 import ProviderDetailSheet from "@/components/ProviderDetailSheet";
 import { useGeolocation } from "@/hooks/useGeolocation";
+import { useLanguage } from "@/hooks/useLanguage";
 
 interface Provider {
   id: string;
@@ -83,20 +91,45 @@ const defaultProviders: Provider[] = [
 const ProviderResults = () => {
   const location = useLocation();
   const navigate = useNavigate();
+  const { t } = useLanguage();
   const serviceType: string = (location.state as any)?.serviceType || "Other";
   const { location: userLocation, loading: locationLoading } = useGeolocation();
   const [selectedProvider, setSelectedProvider] = useState<Provider | null>(null);
-  const [sortOrder, setSortOrder] = useState<'low' | 'high'>('low');
+  const [sortKey, setSortKey] = useState<'visitingCharge' | 'distance' | 'rating' | 'experience'>('visitingCharge');
+  const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
 
   const providers = useMemo(() => {
     const base = stockProviders[serviceType] || defaultProviders;
     const parsePrice = (charge: string) => parseInt(charge.replace(/[^\d]/g, '')) || 0;
-    return [...base].sort((a, b) =>
-      sortOrder === 'low'
-        ? parsePrice(a.visitingCharge) - parsePrice(b.visitingCharge)
-        : parsePrice(b.visitingCharge) - parsePrice(a.visitingCharge)
-    );
-  }, [serviceType, sortOrder]);
+    const parseDistance = (d: string) => parseFloat(d.replace(/[^0-9\.]/g, '')) || 0;
+
+    const sorted = [...base].sort((a, b) => {
+      let av = 0;
+      let bv = 0;
+      switch (sortKey) {
+        case 'visitingCharge':
+          av = parsePrice(a.visitingCharge);
+          bv = parsePrice(b.visitingCharge);
+          break;
+        case 'distance':
+          av = parseDistance(a.distance);
+          bv = parseDistance(b.distance);
+          break;
+        case 'rating':
+          av = a.rating;
+          bv = b.rating;
+          break;
+        case 'experience':
+          av = a.experience || 0;
+          bv = b.experience || 0;
+          break;
+      }
+      if (av === bv) return 0;
+      return sortOrder === 'asc' ? av - bv : bv - av;
+    });
+
+    return sorted;
+  }, [serviceType, sortKey, sortOrder]);
 
   const mapProviders = providers.map((p) => ({
     id: p.id,
@@ -118,7 +151,7 @@ const ProviderResults = () => {
               className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors mb-6"
             >
               <ArrowLeft className="w-4 h-4" />
-              Back
+              {t('common.back')}
             </button>
 
             <div className="text-center mb-6">
@@ -126,20 +159,42 @@ const ProviderResults = () => {
                 {serviceType}
               </span>
               <h1 className="text-2xl md:text-3xl font-bold text-foreground mb-2">
-                Nearby Service Providers
+                {t('providerResults.nearbyTitle')}
               </h1>
               <p className="text-muted-foreground">
-                {`${providers.length} professionals found near you`}
+                {t('providerResults.professionalsFound').replace('{count}', String(providers.length))}
               </p>
-              <div className="mt-3">
+              <div className="mt-3 flex justify-center items-center gap-3">
+                <div className="w-48">
+                  <Select value={sortKey} onValueChange={(v) => setSortKey(v as any)}>
+                    <SelectTrigger>
+                      <SelectValue>
+                        {sortKey === 'visitingCharge'
+                          ? t('providerResults.sort.visitingCharge')
+                          : sortKey === 'distance'
+                          ? t('providerResults.sort.distance')
+                          : sortKey === 'rating'
+                          ? t('providerResults.sort.rating')
+                          : t('providerResults.sort.experience')}
+                      </SelectValue>
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="visitingCharge">{t('providerResults.sort.visitingCharge')}</SelectItem>
+                      <SelectItem value="distance">{t('providerResults.sort.distance')}</SelectItem>
+                      <SelectItem value="rating">{t('providerResults.sort.rating')}</SelectItem>
+                      <SelectItem value="experience">{t('providerResults.sort.experience')}</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
                 <Button
                   variant="outline"
                   size="sm"
                   className="gap-2"
-                  onClick={() => setSortOrder(sortOrder === 'low' ? 'high' : 'low')}
+                  onClick={() => setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc')}
                 >
                   <ArrowDownUp className="w-4 h-4" />
-                  Price: {sortOrder === 'low' ? 'Low to High' : 'High to Low'}
+                  {sortOrder === 'asc' ? t('providerResults.asc') : t('providerResults.desc')}
                 </Button>
               </div>
             </div>
@@ -149,7 +204,7 @@ const ProviderResults = () => {
               {locationLoading ? (
                 <div className="w-full h-[250px] rounded-2xl border border-border bg-card flex items-center justify-center gap-2 text-muted-foreground">
                   <Loader2 className="w-5 h-5 animate-spin" />
-                  <span className="text-sm">Fetching your location...</span>
+                  <span className="text-sm">{t('providerResults.fetchingLocation')}</span>
                 </div>
               ) : (
                 <LocationMap userLocation={userLocation} providers={mapProviders} />
@@ -159,12 +214,12 @@ const ProviderResults = () => {
             {providers.length === 0 ? (
               <div className="bg-card rounded-2xl p-8 border border-border text-center">
                 <MapPin className="w-10 h-10 text-muted-foreground mx-auto mb-3" />
-                <h3 className="text-lg font-semibold text-foreground mb-1">No providers found</h3>
+                <h3 className="text-lg font-semibold text-foreground mb-1">{t('providerResults.noProviders')}</h3>
                 <p className="text-sm text-muted-foreground mb-4">
-                  No {serviceType.toLowerCase()} professionals are available right now.
+                  {t('providerResults.noProvidersDesc').replace('{service}', serviceType.toLowerCase())}
                 </p>
                 <Button variant="outline" onClick={() => navigate("/")}>
-                  Browse other services
+                  {t('providerResults.browseOther')}
                 </Button>
               </div>
             ) : (
@@ -203,7 +258,7 @@ const ProviderResults = () => {
                             <MapPin className="w-3.5 h-3.5" />
                             {provider.distance}
                           </span>
-                          <span>{provider.experience} yrs exp</span>
+                          <span>{t('providerResults.yearsExp').replace('{years}', String(provider.experience))}</span>
                         </div>
                       </div>
 
@@ -213,7 +268,7 @@ const ProviderResults = () => {
                         className="flex-shrink-0"
                         onClick={() => setSelectedProvider(provider)}
                       >
-                        Select
+                          {t('providerResults.select')}
                       </Button>
                     </div>
                   </motion.div>

@@ -16,11 +16,21 @@ router.get('/profile', protect, async (req, res) => {
 
 // PUT /api/providers/profile  - update current provider's profile
 router.put('/profile', protect, async (req, res) => {
-  const { fullName, description, experienceYears, hourlyRate, serviceType, city, serviceRadius } = req.body;
+  const { fullName, description, experienceYears, hourlyRate, serviceType, city, serviceRadius, language } = req.body;
   try {
+    const updates = {};
+    if (typeof fullName === 'string') updates.fullName = fullName;
+    if (typeof description !== 'undefined') updates.description = description;
+    if (typeof experienceYears !== 'undefined') updates.experienceYears = experienceYears;
+    if (typeof hourlyRate !== 'undefined') updates.hourlyRate = hourlyRate;
+    if (typeof serviceType === 'string') updates.serviceType = serviceType;
+    if (typeof city === 'string') updates.city = city;
+    if (typeof serviceRadius !== 'undefined') updates.serviceRadius = serviceRadius;
+    if (typeof language === 'string') updates.language = language;
+
     const provider = await ServiceProvider.findOneAndUpdate(
       { userId: req.user.id },
-      { fullName, description, experienceYears, hourlyRate, serviceType, city, serviceRadius },
+      updates,
       { new: true }
     );
     if (!provider) return res.status(404).json({ message: 'Provider profile not found' });

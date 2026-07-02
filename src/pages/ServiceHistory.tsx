@@ -8,10 +8,12 @@ import { History, CheckCircle2, Clock, MapPin, Star } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { motion } from 'framer-motion';
 import { Separator } from '@/components/ui/separator';
+import { useLanguage } from '@/hooks/useLanguage';
 
 const ServiceHistory = () => {
   const { user, isLoading } = useAuth();
   const navigate = useNavigate();
+  const { t } = useLanguage();
 
   useEffect(() => { if (!isLoading && !user) navigate('/auth'); }, [user, isLoading, navigate]);
 
@@ -29,9 +31,9 @@ const ServiceHistory = () => {
         <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4 }}>
           <h1 className="text-2xl font-bold text-foreground mb-2 flex items-center gap-2">
             <History className="w-6 h-6 text-primary" />
-            Service History
+            {t('history.title')}
           </h1>
-          <p className="text-muted-foreground mb-6">Your past completed services</p>
+          <p className="text-muted-foreground mb-6">{t('history.subtitle')}</p>
         </motion.div>
         <div className="space-y-4">
           {history.map((h, i) => (
@@ -48,7 +50,8 @@ const ServiceHistory = () => {
                   <p className="text-sm text-muted-foreground">{h.provider}</p>
                 </div>
                 <Badge variant="outline" className={h.status === 'Completed' ? 'bg-primary/10 text-primary border-primary/30' : 'bg-destructive/10 text-destructive border-destructive/30'}>
-                  {h.status === 'Completed' && <CheckCircle2 className="w-3 h-3 mr-1" />}{h.status}
+                  {h.status === 'Completed' && <CheckCircle2 className="w-3 h-3 mr-1" />}
+                  {h.status === 'Completed' ? t('status.completed') : t('status.cancelled')}
                 </Badge>
               </div>
               <Separator className="my-2" />

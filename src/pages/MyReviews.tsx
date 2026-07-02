@@ -5,10 +5,12 @@ import { useAuth } from '@/hooks/useAuth';
 import { useNavigate } from 'react-router-dom';
 import { useEffect } from 'react';
 import { Star } from 'lucide-react';
+import { useLanguage } from '@/hooks/useLanguage';
 
 const MyReviews = () => {
   const { user, isLoading } = useAuth();
   const navigate = useNavigate();
+  const { t } = useLanguage();
 
   useEffect(() => { if (!isLoading && !user) navigate('/auth'); }, [user, isLoading, navigate]);
 
@@ -22,8 +24,8 @@ const MyReviews = () => {
       <Header />
       <main className="container mx-auto px-4 pt-24 pb-16 max-w-2xl">
         <BackToDashboard />
-        <h1 className="text-2xl font-bold text-foreground mb-2">My Reviews</h1>
-        <p className="text-muted-foreground mb-6">Reviews you've given to service providers</p>
+        <h1 className="text-2xl font-bold text-foreground mb-2">{t('myReviews.title')}</h1>
+        <p className="text-muted-foreground mb-6">{t('myReviews.subtitle')}</p>
         <div className="space-y-4">
           {reviews.map(r => (
             <div key={r.id} className="bg-card rounded-xl border border-border p-5">

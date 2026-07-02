@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const jwt = require('jsonwebtoken');
+const mongoose = require('mongoose');
 const { body, validationResult } = require('express-validator');
 const User = require('../models/User');
 const Profile = require('../models/Profile');
@@ -12,6 +13,15 @@ const generateToken = (user) =>
     process.env.JWT_SECRET,
     { expiresIn: process.env.JWT_EXPIRES_IN || '7d' }
   );
+
+const ensureDatabaseReady = (res) => {
+  if (mongoose.connection.readyState !== 1) {
+    res.status(503).json({ message: 'Database is not connected. Please try again after MongoDB is restored.' });
+    return false;
+  }
+
+  return true;
+};
 
 // POST /api/auth/register
 router.post(
@@ -26,7 +36,9 @@ router.post(
     const errors = validationResult(req);
     if (!errors.isEmpty()) return res.status(400).json({ errors: errors.array() });
 
-    const { email, password, role, fullName, phone, serviceType, city, description, experienceYears, hourlyRate } = req.body;
+    if (!ensureDatabaseReady(res)) return;
+
+    const { email, password, role, fullName, phone, serviceType, city, description, experienceYears, hourlyRate, language } = req.body;
 
     try {
       const existing = await User.findOne({ email });
@@ -42,6 +54,7 @@ router.post(
           phone: phone || '',
           serviceType: serviceType || '',
           city: city || '',
+          language: language || 'en',
           description: description || null,
           experienceYears: experienceYears ? Number(experienceYears) : null,
           hourlyRate: hourlyRate || null,
@@ -52,13 +65,14 @@ router.post(
           fullName,
           email,
           phone: phone || null,
+          language: language || 'en',
         });
       }
 
       const token = generateToken(user);
       res.status(201).json({
         token,
-        user: { id: user._id.toString(), email: user.email, role: user.role },
+        user: { id: user._id.toString(), email: user.email, role: user.role, language: language || 'en' },
       });
     } catch (err) {
       console.error(err);
@@ -77,6 +91,8 @@ router.post(
   async (req, res) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) return res.status(400).json({ errors: errors.array() });
+
+    if (!ensureDatabaseReady(res)) return;
 
     const { email, password } = req.body;
 

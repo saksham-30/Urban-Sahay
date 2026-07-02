@@ -16,11 +16,16 @@ router.get('/profile', protect, async (req, res) => {
 
 // PUT /api/users/profile  - update current user's profile
 router.put('/profile', protect, async (req, res) => {
-  const { fullName, phone } = req.body;
+  const { fullName, phone, language } = req.body;
   try {
+    const updates = {};
+    if (typeof fullName === 'string') updates.fullName = fullName;
+    if (typeof phone !== 'undefined') updates.phone = phone;
+    if (typeof language === 'string') updates.language = language;
+
     const profile = await Profile.findOneAndUpdate(
       { userId: req.user.id },
-      { fullName, phone },
+      updates,
       { new: true }
     );
     if (!profile) return res.status(404).json({ message: 'Profile not found' });
