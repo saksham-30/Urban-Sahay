@@ -2,6 +2,8 @@ import type { Language } from '@/lib/translations';
 
 const BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
 export const API_ORIGIN = BASE_URL.replace(/\/api$/, '');
+export const ML_API_ORIGIN = import.meta.env.VITE_ML_API_URL || 'http://127.0.0.1:8000';
+export const PRICE_API_ORIGIN = import.meta.env.VITE_PRICE_API_URL || 'http://127.0.0.1:8001';
 
 function getToken(): string | null {
   return localStorage.getItem('urban_sahay_token');

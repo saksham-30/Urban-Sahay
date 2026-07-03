@@ -1,4 +1,4 @@
-import { api, ProviderProfile } from "@/lib/api";
+import { api, ProviderProfile, ML_API_ORIGIN, PRICE_API_ORIGIN } from "@/lib/api";
 
 export type ServiceCategory =
   | "Plumber"
@@ -46,8 +46,8 @@ export interface PriceEstimate {
   max: number;
 }
 
-const ML_API_BASE_URL = import.meta.env.VITE_ML_API_URL || "http://127.0.0.1:8000";
-const PRICE_API_BASE_URL = import.meta.env.VITE_PRICE_API_URL || "http://127.0.0.1:8001";
+const ML_API_BASE_URL = ML_API_ORIGIN;
+const PRICE_API_BASE_URL = PRICE_API_ORIGIN;
 
 const serviceAliases: Record<string, ServiceCategory> = {
   plumber: "Plumber",

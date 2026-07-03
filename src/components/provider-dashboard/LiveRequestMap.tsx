@@ -1,4 +1,4 @@
-import { useEffect, useState, useMemo } from "react";
+import { useCallback, useEffect, useState, useMemo } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -22,6 +22,18 @@ interface ServiceRequest {
 
 interface Props {
   serviceRadius?: number;
+}
+
+interface ConcernApiRecord {
+  _id?: string;
+  name?: string;
+  location?: string;
+  serviceType?: string;
+  urgency?: string;
+  createdAt?: string;
+  status?: string;
+  phone?: string;
+  concern?: string;
 }
 
 const urgencyConfig: Record<string, { color: string; label: string; pulse: boolean; badge: string }> = {
@@ -52,43 +64,8 @@ const getRadiusSize = (km: number) => {
   return Math.min(20 + km * 3.5, 80);
 };
 
-const LiveRequestMap = ({ serviceRadius = 10 }: Props) => {
-  const [requests, setRequests] = useState<ServiceRequest[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [selectedPin, setSelectedPin] = useState<number | null>(null);
-  const [sortBy, setSortBy] = useState<"distance" | "time" | "urgency">("distance");
-  const { location: userLocation, loading: geoLoading } = useGeolocation();
-  const navigate = useNavigate();
-
-  const center = userLocation || fallbackCenter;
-
-  const fetchRequests = async () => {
-    try {
-      const data = await api.getConcerns();
-      // Filter to only open/active concerns and map fields
-      const activeConcerns = (Array.isArray(data) ? data : [])
-        .filter((c: any) => c.status === "open")
-        .map((c: any) => ({
-          id: c._id,
-          name: c.name,
-          location: c.location,
-          service_type: c.serviceType,
-          urgency: c.urgency || "medium",
-          created_at: c.createdAt,
-          status: c.status,
-          phone: c.phone,
-          concern: c.concern,
-        }));
-      setRequests(activeConcerns.length ? activeConcerns : demoRequests);
-    } catch (error) {
-      console.error("Failed to fetch requests:", error);
-      setRequests(demoRequests);
-    }
-    setLoading(false);
-  };
-
-  // Demo fallback requests (used when backend returns none)
-  const demoRequests: ServiceRequest[] = [
+// Demo fallback requests (used when backend returns none)
+const demoRequests: ServiceRequest[] = [
     {
       id: "demo-1",
       name: "Ramesh Kumar",
@@ -135,6 +112,41 @@ const LiveRequestMap = ({ serviceRadius = 10 }: Props) => {
     },
   ];
 
+const LiveRequestMap = ({ serviceRadius = 10 }: Props) => {
+  const [requests, setRequests] = useState<ServiceRequest[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [selectedPin, setSelectedPin] = useState<number | null>(null);
+  const [sortBy, setSortBy] = useState<"distance" | "time" | "urgency">("distance");
+  const { location: userLocation, loading: geoLoading } = useGeolocation();
+  const navigate = useNavigate();
+
+  const center = userLocation || fallbackCenter;
+
+  const fetchRequests = useCallback(async () => {
+    try {
+      const data = await api.getConcerns();
+      const activeConcerns = (Array.isArray(data) ? data : [])
+        .filter((c: ConcernApiRecord) => c.status === "open")
+        .map((c: ConcernApiRecord) => ({
+          id: c._id || "",
+          name: c.name || "",
+          location: c.location || "",
+          service_type: c.serviceType || "",
+          urgency: c.urgency || "medium",
+          created_at: c.createdAt || new Date().toISOString(),
+          status: c.status || "open",
+          phone: c.phone || "",
+          concern: c.concern || "",
+        }))
+        .filter((item) => Boolean(item.id));
+      setRequests(activeConcerns.length ? activeConcerns : demoRequests);
+    } catch (error) {
+      console.error("Failed to fetch requests:", error);
+      setRequests(demoRequests);
+    }
+    setLoading(false);
+  }, []);
+
   useEffect(() => {
     fetchRequests();
 
@@ -142,7 +154,7 @@ const LiveRequestMap = ({ serviceRadius = 10 }: Props) => {
     const interval = setInterval(fetchRequests, 5000);
 
     return () => clearInterval(interval);
-  }, []);
+  }, [fetchRequests]);
 
   // Attach simulated distance to each request
   const requestsWithDistance = useMemo(() => {
@@ -159,9 +171,10 @@ const LiveRequestMap = ({ serviceRadius = 10 }: Props) => {
     switch (sortBy) {
       case "distance":
         return sorted.sort((a, b) => a.distance - b.distance);
-      case "urgency":
+      case "urgency": {
         const urgencyOrder = { high: 0, medium: 1, low: 2 };
         return sorted.sort((a, b) => (urgencyOrder[a.urgency as keyof typeof urgencyOrder] ?? 1) - (urgencyOrder[b.urgency as keyof typeof urgencyOrder] ?? 1));
+      }
       case "time":
       default:
         return sorted.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());

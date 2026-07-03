@@ -41,7 +41,42 @@ interface Conversation {
   updated_at: string;
 }
 
-function toUiConversation(c: any): Conversation {
+interface ConversationApiRecord {
+  _id?: string;
+  id?: string;
+  customerId?: string;
+  customer_id?: string;
+  providerId?: string;
+  provider_id?: string;
+  jobContext?: string | null;
+  job_context?: string | null;
+  createdAt?: string;
+  created_at?: string;
+  updatedAt?: string;
+  updated_at?: string;
+}
+
+interface MessageApiRecord {
+  _id?: string;
+  id?: string;
+  conversationId?: string;
+  conversation_id?: string;
+  senderId?: string;
+  sender_id?: string;
+  content?: string | null;
+  imageUrl?: string | null;
+  image_url?: string | null;
+  messageType?: string;
+  message_type?: string;
+  isAuto?: boolean;
+  is_auto?: boolean;
+  readAt?: string | null;
+  read_at?: string | null;
+  createdAt?: string;
+  created_at?: string;
+}
+
+function toUiConversation(c: ConversationApiRecord): Conversation {
   return {
     id: c._id || c.id,
     customer_id: c.customerId || c.customer_id,
@@ -52,7 +87,7 @@ function toUiConversation(c: any): Conversation {
   };
 }
 
-function toUiMessage(m: any): Message {
+function toUiMessage(m: MessageApiRecord): Message {
   return {
     id: m._id || m.id,
     conversation_id: m.conversationId || m.conversation_id,
@@ -110,7 +145,7 @@ const ChatPage = () => {
     const init = async () => {
       if (targetUserId && !conversationId) {
         const conv = await api.findOrCreateConversation(targetUserId);
-        setActiveConversation(conv._id || (conv as any).id);
+        setActiveConversation(conv._id || conv.id || null);
       }
 
       const convs = await api.getConversations();
@@ -148,7 +183,7 @@ const ChatPage = () => {
 
     // Join socket room
     socketRef.current?.emit('join_conversation', activeConversation);
-    socketRef.current?.on('new_message', (msg: any) => {
+    socketRef.current?.on('new_message', (msg: MessageApiRecord) => {
       const uiMsg = toUiMessage(msg);
       setMessages(prev => {
         if (prev.some(m => m.id === uiMsg.id)) return prev;

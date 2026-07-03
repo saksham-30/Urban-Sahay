@@ -7,7 +7,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { AlertCircle, CheckCircle2, MapPin, Phone, User, ArrowLeft, Loader2, LocateFixed, IndianRupee } from "lucide-react";
 import { useGeolocation } from "@/hooks/useGeolocation";
 import { toast } from "sonner";
-import { api } from "@/lib/api";
+import { api, PRICE_API_ORIGIN } from "@/lib/api";
 import { useAuth } from "@/hooks/useAuth";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
@@ -217,7 +217,7 @@ const affordableServices = new Set([
   "Home Tutor",
 ]);
 
-const PRICE_API_BASE_URL = import.meta.env.VITE_PRICE_API_URL || "http://127.0.0.1:8001";
+const PRICE_API_BASE_URL = PRICE_API_ORIGIN;
 
 type PriceEstimate = {
   min: number;

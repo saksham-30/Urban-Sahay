@@ -1,3 +1,5 @@
+import { ML_API_ORIGIN } from "@/lib/api";
+
 export interface ServiceSuggestion {
   category: string;
   slug: string;
@@ -8,7 +10,7 @@ interface PredictResponse {
   predicted_category: string;
 }
 
-const ML_API_BASE_URL = import.meta.env.VITE_ML_API_URL || "http://127.0.0.1:8000";
+const ML_API_BASE_URL = ML_API_ORIGIN;
 
 const SERVICE_MAPPING: Record<string, ServiceSuggestion> = {
   plumber: { category: "Plumber", slug: "plumber", emoji: "🔧" },
