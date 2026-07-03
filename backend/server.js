@@ -24,8 +24,12 @@ const allowedOrigins = [...new Set([...defaultOrigins, ...configuredOrigins])];
 
 const corsOptions = {
   origin(origin, callback) {
-    // Allow requests with no origin (like curl/postman/mobile apps).
-    if (!origin || allowedOrigins.includes(origin) || /^http:\/\/localhost:\d+$/.test(origin)) {
+    if (
+      !origin ||
+      allowedOrigins.includes(origin) ||
+      /^http:\/\/localhost:\d+$/.test(origin) ||
+      /\.vercel\.app$/.test(origin)
+    ) {
       return callback(null, true);
     }
     return callback(null, false);
@@ -34,15 +38,12 @@ const corsOptions = {
   credentials: true,
 };
 
-// Socket.io for real-time chat
 const io = new Server(httpServer, {
   cors: corsOptions,
 });
 
-// Connect to MongoDB
 connectDB();
 
-// Middleware
 app.use(cors(corsOptions));
 app.use(express.json());
 
@@ -54,7 +55,6 @@ app.get('/health', (_req, res) => {
   res.json({ status: 'ok' });
 });
 
-// Routes
 app.use('/api/auth', authRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/providers', providerRoutes);
@@ -62,28 +62,22 @@ app.use('/api/concerns', concernRoutes);
 app.use('/api/conversations', conversationRoutes);
 app.use('/api/kyc', kycRoutes);
 
-// Socket.io events for real-time messaging
 io.on('connection', (socket) => {
-  // Join a conversation room
   socket.on('join_conversation', (conversationId) => {
     socket.join(conversationId);
   });
 
-  // Leave a conversation room
   socket.on('leave_conversation', (conversationId) => {
     socket.leave(conversationId);
   });
 
-  // New message event
   socket.on('send_message', (message) => {
-    // Broadcast to everyone in the room except sender
     socket.to(message.conversation_id).emit('new_message', message);
   });
 
   socket.on('disconnect', () => {});
 });
 
-// Attach io to app so routes can emit events
 app.set('io', io);
 
 const PORT = process.env.PORT || 5000;
