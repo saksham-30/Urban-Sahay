@@ -1,4 +1,10 @@
 fastapi==0.116.1
 uvicorn==0.35.0
+# Pin numpy/scipy/scikit-learn to versions that provide prebuilt wheels for Python 3.11
+numpy==1.26.4
+scipy==1.13.1
 scikit-learn==1.7.1
+# pydantic is a FastAPI dependency; pin a compatible minor version to avoid surprises
+pydantic==2.6.3
+# Optional: requests used only for local tests; keep it for convenience
 requests==2.32.4
